@@ -1,0 +1,392 @@
+---
+title: "Base de Dados - Pré-projeto - Doutorado"
+output: html_document
+author: Renato Victor Lira Brito
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F)
+```
+
+```{r}
+library(poliscidata)
+
+library(tidyverse)
+```
+
+```{r}
+PAÍS <- c("Estados Unidos da América", "Reino Unido", "Arábia Saudita",
+          "Estônia", "República da Coreia", "Cingapura", 
+          "Espanha", "Rússia", "Emirados Árabes Unidos",
+          "Malásia", "Lituânia", "Japão",
+          "Canadá", "França", "Índia",
+          "Turquia", "Austrália", "Luxemburgo",
+          "Alemanha", "Portugal", "Letônia",
+          "Países Baixos", "Noruega", "Maurícia",
+          "Brasil", "Bélgica", "Itália",
+          "Omã", "Finlândia", "Egito",
+          "Indonésia", "Vietnã", "Suécia",
+          "Catar", "Grécia", "Áustria",
+          "Polônia", "Cazaquistão", "Dinamarca",
+          "China", "Croácia", "Eslováquia",
+          "Hungria", "Israel", "Tanzânia",
+          "Macêdonia do Norte", "Sérvia", "Azerbaijão",
+          "Chipre", "Suíça", "Gana",
+          "Tailândia", "Tunísia", "Irlanda",
+          "Nigéria", "Nova Zelândia", "Malta",
+          "Marrocos", "Quênia", "México",
+          "Bangladesh", "República Islâmica do Irão", "Geórgia",
+          "Benim", "Ruanda", "Islândia",
+          "África do Sul", "Barém", "Filipinas",
+          "Romênia", "Moldávia", "Uruguai",
+          "Kuwait", "República Dominicana", "Eslovênia",
+          "Chéquia", "Mônaco", "Uzbequistão",
+          "Jordânia", "Uganda", "Zâmbia",
+          "Chile", "Costa do Marfim", "Costa Rica",
+          "Bulgária", "Ucrânia", "Paquistão",
+          "Albânia", "Colômbia", "Cuba",
+          "Sri Lanka", "Paraguai", "Brunei",
+          "Peru", "Montenegro", "Botswana",
+          "Bielorrússia", "Armênia", "Argentina",
+          "Quirguistão", "Camarões", "Nepal",
+          "Chade", "Burquina Fasso", "Malawi",
+          "Zimbabwe", "Mianmar", "Senegal",
+          "Liechtenstein", "Sudão", "Panamá",
+          "Argélia", "Togo", "Jamaica",
+          "Gâmbia", "Suriname", "Líbano",
+          "Bósnia e Herzegovina", "Samoa", "Fiji",
+          "Líbia", "Guiana", "Etiópia",
+          "Venezuela", "Andorra", "Papua-Nova Guiné",
+          "Equador", "Mongólia", "Serra Leoa",
+          "Palestina", "Moçambique", "Madagáscar",
+          "Trindade e Tobago", "Síria", "Nauru",
+          "Tonga", "Iraque", "Guiné",
+          "Laos", "Camboja", "Mauritânia",
+          "Butão", "Essuatíni", "Cabo Verde",
+          "Somália", "Tajiquistão", "Barbados",
+          "Bolívia", "São Tomé e Príncipe", "Antígua e Barbuda",
+          "República do Congo", "Turcomenistão", "Kiribati",
+          "San Marino", "Bahamas", "El Salvador",
+          "Seicheles", "Guatemala", "Angola",
+          "Vanuatu", "São Cristóvão e Neves", "São Vicente e Granadinas",
+          "Namíbia", "Níger", "Gabão", 
+          "Santa Lúcia", "Belize", "Mali",
+          "Guiné-Bissau", "Libéria", "Granada",
+          "Lesoto", "Nicarágua", "Ilhas Salomão",
+          "Haiti", "Tuvalu", "Sudão do Sul",
+          "República Democrática do Congo", "Afeganistão", "Ilhas Marshall",
+          "Timor-Leste", "Dominica", "Comores",
+          "República Centro-Africana", "Maldivas", "Honduras",
+          "Djibouti", "Burundi", "Eritreia",
+          "Guiné Equatorial", "Coreia do Norte", "Estados Federados da Micronésia",
+          "Vaticano", "Iêmen")
+  
+SIGLA_PAÍS <- c("USA","GBR", "SAU", 
+                "EST", "KOR", "SGP", 
+                "ESP", "RUS", "ARE",
+                "MAS", "LTU", "JPN",
+                "CAN", "FRA", "IND",
+                "TUR", "AUS", "LUX",
+                "GER", "POR", "LAT",
+                "NED", "NOR", "MRI",
+                "BRA", "BEL", "ITA", 
+                "OMA", "FIN", "EGY",
+                "INA", "VIE", "SWE",
+                "QAT", "GRE", "AUT",
+                "POL", "KAZ", "DEN",
+                "CHN", "CRO", "SVK",
+                "HUN", "ISR", "TAN",
+                "MKD", "SRB", "AZE", 
+                "CYP", "SUI", "GHA",
+                "THA", "TUN", "IRL",
+                "NGR", "NZL", "MLT",
+                "MAR", "KEN", "MEX",
+                "BAN", "IRI", "GEO",
+                "BEN", "RWA", "ISL",
+                "RSA", "BRN", "PHI",
+                "ROU", "MDA", "URU",
+                "KUW", "DOM", "SLO",
+                "CZE", "MON", "UZB",
+                "JOR", "UGA", "ZAM",
+                "CHI", "CIV", "CRC",
+                "BUL", "UKR", "PAK",
+                "ALB", "COL", "CUB",
+                "SRI", "PAR", "BRU",
+                "PER", "MNE", "BOT",
+                "BLR", "ARM", "ARG",
+                "KGZ", "CMR", "NEP",
+                "CHA", "BUR", "MAW",
+                "ZIM", "MYA", "SEN",
+                "LIE", "SUD", "PAN",
+                "ALG", "TOG", "JAM",
+                "GAM", "SUR", "LIB",
+                "BIH", "SAM", "FIJ",
+                "LBA", "GUY", "ETH",
+                "VEN", "AND", "PNG",
+                "ECU", "MGL", "SLE",
+                "PLE", "MOZ", "MAD",
+                "TTO", "SYR", "NRU",
+                "TGA", "IRQ", "GUI",
+                "LAO", "CAM", "MTN",
+                "BHU", "SWZ", "CPV",
+                "SOM", "TJK", "BAR",
+                "BOL", "STP", "ANT",
+                "CGO", "TKM", "KIR",
+                "SMR", "BAH", "ESA",
+                "SEY", "GUA", "ANG",
+                "VAN", "SKN", "VIN",
+                "NAM", "NIG", "GAB", 
+                "LCA", "BIZ", "MLI",
+                "GBS", "LBR", "GRN",
+                "LES", "NCA", "SOL",
+                "HAI", "TUV", "SSD",
+                "COD", "AFG", "MHL",
+                "TLS", "DMA", "COM",
+                "CAF", "MDV", "HON",
+                "DJI", "BDI", "ERI",
+                "GEQ", "PRK", "FSM",
+                "VAT", "YEM")
+
+
+PONTUAÇÃO_GCI_2020 <- c(100, 99.54, 99.54, 
+                        99.48, 98.52, 98.52, 
+                        98.52, 98.06, 98.06,
+                        98.06, 97.93, 97.82,
+                        97.67, 97.6, 97.5,
+                        97.49, 97.47, 97.41,
+                        97.41, 97.32, 97.28,
+                        97.05, 96.89, 96.89,
+                        96.6, 96.25, 96.13,
+                        96.04, 95.78, 95.48,
+                        94.88, 94.59, 94.55,
+                        94.5, 93.98, 93.89,
+                        93.86, 93.15, 92.6,
+                        92.53, 92.53, 92.36,
+                        91.28, 90.93, 90.58,
+                        89.92, 89.8, 89.31,
+                        88.82, 86.97, 86.69,
+                        86.5, 86.23, 85.86,
+                        84.76, 84.04, 83.65,
+                        82.41, 81.7, 81.68,
+                        81.27, 81.07, 81.06,
+                        80.06, 79.95, 79.81,
+                        78.46, 77.86, 77,
+                        76.29, 75.78, 75.15,
+                        75.07, 75.05, 74.93,
+                        74.37, 72.57, 71.11,
+                        70.96, 69.98, 68.88,
+                        68.83, 67.82, 67.45,
+                        67.38, 65.93, 64.88,
+                        64.32, 63.72, 58.76,
+                        58.65, 57.09, 56.07,
+                        55.67, 53.23, 53.06,
+                        50.57, 50.47, 50.12,
+                        49.64, 45.63, 44.99,
+                        40.44, 39.98, 36.83,
+                        36.49, 36.41, 35.85,
+                        35.15, 35.03, 34.11,
+                        33.95, 33.19, 32.53,
+                        32.12, 31.2, 30.44,
+                        29.44, 29.33, 29.08,
+                        28.78, 28.11, 27.74,
+                        27.06, 26.38, 26.33,
+                        26.3, 26.2, 25.31,
+                        25.18, 24.18, 23.33,
+                        22.18, 22.14, 21.42,
+                        20.95, 20.71, 20.53,
+                        20.34, 19.12, 18.94,
+                        18.34, 18.23, 17.74,
+                        17.25, 17.1, 16.89,
+                        16.14, 15.64, 15.62,
+                        14.72, 14.48, 13.84,
+                        13.83, 13.37, 13.3,
+                        13.23, 13.13, 12.99,
+                        12.88, 12.44, 12.18,
+                        11.47, 11.38, 11.36,
+                        10.96, 10.29, 10.14,
+                        9.85, 9.72, 9.41,
+                        9.08, 9, 7.08,
+                        6.4, 5.78, 5.75,
+                        5.3, 5.2, 4.9,
+                        4.26, 4.2, 3.72,
+                        3.24, 2.95, 2.2,
+                        1.73, 1.73, 1.73,
+                        1.46, 1.35, 0,
+                        0, 0)
+
+RANQUE_GLOBAL_GCI_2020 <- c(1, 2, 2, 
+                            3, 4, 4, 
+                            4, 5, 5,
+                            5, 6, 7,
+                            8, 9, 10,
+                            11, 12, 13,
+                            13, 14, 15,
+                            16, 17, 17,
+                            18, 19, 20,
+                            21, 22, 23,
+                            24, 25, 26,
+                            27, 28, 29,
+                            30, 31, 32,
+                            33, 33, 34,
+                            35, 36, 37,
+                            38, 39, 40,
+                            41, 42, 43,
+                            44, 45, 46,
+                            47, 48, 49,
+                            50, 51, 52,
+                            53, 54, 55,
+                            56, 57, 58,
+                            59, 60, 61,
+                            62, 63, 64, 
+                            65, 66, 67,
+                            68, 69, 70,
+                            71, 72, 73,
+                            74, 75, 76,
+                            77, 78, 79,
+                            80, 81, 82,
+                            83, 84, 85,
+                            86, 87, 88,
+                            89, 90, 91,
+                            92, 93, 94,
+                            95, 96, 97,
+                            98, 99, 100,
+                            101, 102, 103,
+                            104, 105, 106,
+                            107, 108, 109,
+                            110, 111, 112,
+                            113, 114, 115,
+                            116, 117, 118,
+                            119, 120, 121,
+                            122, 123, 124,
+                            125, 126, 127,
+                            128, 129, 130,
+                            131, 132, 133,
+                            134, 135, 136,
+                            137, 138, 139,
+                            140, 141, 142,
+                            143, 144, 145,
+                            146, 147, 148,
+                            149, 150, 151,
+                            152, 153, 154,
+                            155, 156, 157,
+                            158, 159, 160,
+                            161, 162, 163,
+                            164, 165, 166,
+                            167, 168, 169,
+                            170, 171, 172,
+                            173, 174, 175,
+                            176, 177, 178,
+                            179, 179, 179,
+                            180, 181, 182,
+                            182, 182)
+
+REGIAO_GCI_2020 <- c("Américas", "Europa", "Estados Árabes",
+                     "Europa", "Ásia-Pacífico", "Ásia-Pacífico", 
+                     "Europa")
+
+RANQUE_REGIONAL_GCI_2020 <- c(1, 1, 1, 
+                              2, 1, 1,
+                              3)
+
+ÍNDICE_DE_DEMOCRACIA_LIBERAL_2019 <- c(0.728, 0.847, 0.047, 
+                                       0.832, 0.792, 0.307, 
+                                       0.8)
+
+ÍNDICE_DE_DESPESAS_MILITARES_2019 <- c(3.41311, 1.74346, 7.97983, 
+                                       2.12043, 2.67359, 3.20759,
+                                       1.23884)
+
+ÍNDICE_DE_DESENVOLVIMENTO_HUMANO_2019 <- c(0.926, 0.932, 0.854, 
+                                      0.892, 0.916, 0.938,
+                                      0.904)
+
+BANCO_GCI_2020 <- data.frame(PAÍS, SIGLA_PAÍS, PONTUAÇÃO_GCI_2020, RANQUE_GLOBAL_GCI_2020)
+
+```
+
+```{r}
+library(writexl)
+```
+
+```{r}
+write_xlsx(BANCO_GCI_2020,"C://Users//Renato//Desktop//SELEÇÃO DOUTORADO 2022//REFERÊNCIAS//BANCO DE DADOS//Base.xlsx")
+```
+
+
+```{r}
+ggplot(BANCO_GCI_2020, aes(x = "", y = PONTUAÇÃO_GCI_2020)) + 
+  geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) + labs(x = "Distribuição dos casos",
+y = "Pontuação no GCI - 2020")
+```
+```{r}
+library(ggthemes)
+ggplot(BANCO_GCI_2020, aes(RANQUE_GLOBAL_GCI_2020, PONTUAÇÃO_GCI_2020)) +
+geom_point(alpha = 0.1)+
+geom_jitter() +
+theme_classic() + labs(x = "LUGAR NO RANQUE GLOBAL (GCI - 2020)",
+y = "PONTUAÇÃO NO GCI - 2020")
+
+print(BANCO_GCI_2020)
+```
+
+```{r}
+ggplot(BANCO_GCI_2020, aes(PONTUAÇÃO_GCI_2020))+
+  geom_histogram(bins = 30)
+
+ggplot(BANCO_GCI_2020, aes(PONTUAÇÃO_GCI_2020)) +
+  geom_density() + 
+  labs(tittle = "Distribuição dos Países no GCI",
+       x = "Pontuação no GCI",
+       y = "Densidade") 
+
+ggplot(BANCO_GCI_2020, aes(PONTUAÇÃO_GCI_2020)) + 
+  geom_histogram(aes(y=..density..),      
+                 binwidth=4) +
+  geom_density() +
+  geom_vline(aes(xintercept = median(PONTUAÇÃO_GCI_2020, na.rm = T)))+
+  labs(tittle = "Distribuição dos Países no GCI",
+       x = "Pontuação no GCI",
+       y = "Densidade") 
+
+
+```
+
+```{r}
+library(RColorBrewer)
+cores <- brewer.pal(3, "Dark2")
+boxplot(PONTUAÇÃO_GCI_2020, data=BANCO_GCI_2020, col=(cores),
+   ylab="Pontuação no GCI",
+   main="Distribuição" )
+```
+
+```{r}
+library(scales)
+library(tidyverse)
+library(ggplot2)
+library(plan)
+
+```
+
+```{r}
+df <- data.frame(ATIVIDADES=c("Revisão da Literatura", "Levantamento dos Dados", "Primeira Versão da Pesquisa", "Qualificação da Tese", "Análise dos Dados", "Elaboração da Tese", "Versão Final da Tese", "Defesa da Tese"), 
+                 start=c("2022-03-22", "2022-09-22", "2023-03-22", "2023-09-22", "2024-03-22", "2024-09-22", "2025-03-22", "2025-09-22"),
+                 end=c("2022-09-22", "2023-09-22", "2023-09-22", "2023-09-22", "2024-09-22", "2025-03-22", "2025-09-22", "2025-09-22"), 
+                 Etapa=c("Qualificação", "Qualificação", "Qualificação", "Qualificação", "Defesa", "Defesa", "Defesa", "Defesa"))
+
+df <- df %>% 
+  mutate(start = as.Date(start), end = as.Date(end))
+
+df_tidy <- df %>% 
+  gather(key=date_type, value=date, -ATIVIDADES, -Etapa)
+
+ggplot() +
+  geom_line(data=df_tidy, mapping=aes(x=fct_rev(fct_inorder(ATIVIDADES)), y=date, color=Etapa), size=10) +
+  geom_hline(yintercept=as.Date("2023-09-22"), colour="black", linetype="dashed") +
+  coord_flip() +
+  labs(x = "Atividade",
+       y = "Ano",
+       colour = "Etapa") 
+
+```
+
+
